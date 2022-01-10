@@ -8,7 +8,7 @@ Run the script in local machine.
 # ssh-keygen
 ssh-copy-id <user_name>@<server_ip>
 sudo apt install autossh
-cd autosshtunnel
+cd autosshTunnel
 sudo chmod +x install.sh uninstall.sh
 sudo ./install.sh
 ```
