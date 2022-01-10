@@ -1,0 +1,19 @@
+{
+  "interm_server":{
+    "addr": "47.119.124.XXX",
+    "user": "root",
+    "port_map":[
+      {
+        "local_port":"22",
+        "remote_port":"16800",
+        "listen_port":"16850"
+      },
+      {
+        "local_port":"80",
+        "remote_port":"16801",
+        "listen_port":"16851"
+      }
+    ]
+  }
+}
+
