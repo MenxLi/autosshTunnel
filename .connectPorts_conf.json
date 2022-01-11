@@ -6,12 +6,12 @@
       {
         "local_port":"22",
         "remote_port":"16800",
-        "listen_port":"16850"
+        "monitor_port":"16850"
       },
       {
         "local_port":"80",
         "remote_port":"16801",
-        "listen_port":"16851"
+        "monitor_port":"16851"
       }
     ]
   }

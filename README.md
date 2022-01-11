@@ -4,13 +4,14 @@ A script to build autossh tunnel between a local machine and a server for NAT tr
 Run the script in local machine.
 
 ## Installation
+prerequisite:  
+* autossh should be installed
+* local machine should be authorized by the server (e.g. by using `ssh-copy-id`)  
+
 ```bash
-# ssh-keygen
-ssh-copy-id <user_name>@<server_ip>
-sudo apt install autossh
 cd autosshTunnel
-sudo chmod +x install.sh uninstall.sh
-sudo ./install.sh
+sudo chmod +x install.sh
+./install.sh
 ```
 
 ## Configure

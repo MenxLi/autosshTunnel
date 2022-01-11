@@ -10,20 +10,20 @@ CONF_INSTALL_DIR = "/etc"
 
 CMD_LOG_FNAME = "_CONN_PORTS_CMD.log"
 LOG_FNAME = "_CONN_PORTS_LOG.log"
-CURR_DIR = os.path.dirname(__file__)
+# CURR_DIR = os.path.dirname(__file__)
 HOME_DIR = os.getenv("HOME")
 
-def _connectPort(user: str, server_addr: str, local_port: str, remote_port: str, listen_port: str) -> str:
+def _connectPort(user: str, server_addr: str, local_port: str, remote_port: str, monitor_port: str) -> str:
     log_path = os.path.join(HOME_DIR, LOG_FNAME)
     if not os.path.exists(log_path):
         os.system(f"touch {log_path}")
         print("Created log file at: ", log_path)
-    cmd = f"autossh -M {listen_port} -NR {remote_port}:localhost:{local_port} {user}@{server_addr}"
+    cmd = f"autossh -M {monitor_port} -NR {remote_port}:localhost:{local_port} {user}@{server_addr}"
     with open(log_path, "a") as fp:
         fp.write(datetime.datetime.now().strftime("%Y-%m-%d"))
-        fp.write(f"\n{local_port}->{server_addr}:{remote_port}({listen_port})\n")
+        fp.write(f"\n{local_port}->{server_addr}:{remote_port}({monitor_port})\n")
         proc = subprocess.Popen(cmd, shell = True, stderr=subprocess.STDOUT, stdout=fp)
-    print(f"Started connect: localhost:{local_port}->{server_addr}:{remote_port}(listen: {listen_port})")
+    print(f"Started connection: localhost:{local_port}->{server_addr}:{remote_port}(monitor: {monitor_port})")
     return cmd
 
 def _getServerUserAddrAndPorts() -> Tuple[str, str, List[dict]]:
@@ -83,8 +83,8 @@ def start():
     for port_map in port_maps:
         local_port = port_map["local_port"]
         remote_port = port_map["remote_port"]
-        listen_port = port_map["listen_port"]
-        cmd = _connectPort(user, addr, local_port, remote_port, listen_port)
+        monitor_port = port_map["monitor_port"]
+        cmd = _connectPort(user, addr, local_port, remote_port, monitor_port)
         cmds.append(cmd)
 
     with open(cmd_log_path, "w") as fp:
