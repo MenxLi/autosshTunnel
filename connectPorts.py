@@ -1,29 +1,36 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import os, json, sys, datetime
+import os, json, sys, datetime, argparse
 from typing import Tuple, List, Union
 import subprocess
+
+HOME_DIR = os.getenv("HOME")
+if HOME_DIR is None:
+    raise ValueError("Check $HOME has been set.")
 
 CONF_FNAME = ".connectPorts_conf.json"
 CONF_INSTALL_DIR = "/etc"
 
 CMD_LOG_FNAME = "_CONN_PORTS_CMD.log"
+CMD_LOG_PATH = os.path.join(HOME_DIR, CMD_LOG_FNAME)
 LOG_FNAME = "_CONN_PORTS_LOG.log"
+LOG_PATH = os.path.join(HOME_DIR, LOG_FNAME)
 # CURR_DIR = os.path.dirname(__file__)
-HOME_DIR = os.getenv("HOME")
+LOCAL_HOST = "127.0.0.1"
+#  LOCAL_HOST = "localhost"
 
 def _connectPort(user: str, server_addr: str, local_port: str, remote_port: str, monitor_port: str) -> str:
     log_path = os.path.join(HOME_DIR, LOG_FNAME)
     if not os.path.exists(log_path):
         os.system(f"touch {log_path}")
         print("Created log file at: ", log_path)
-    cmd = f"autossh -M {monitor_port} -NR {remote_port}:localhost:{local_port} {user}@{server_addr}"
+    cmd = f"autossh -M {monitor_port} -NR {remote_port}:{LOCAL_HOST}:{local_port} {user}@{server_addr}"
     with open(log_path, "a") as fp:
         fp.write(datetime.datetime.now().strftime("%Y-%m-%d"))
         fp.write(f"\n{local_port}->{server_addr}:{remote_port}({monitor_port})\n")
         proc = subprocess.Popen(cmd, shell = True, stderr=subprocess.STDOUT, stdout=fp)
-    print(f"Started connection: localhost:{local_port}->{server_addr}:{remote_port}(monitor: {monitor_port})")
+    print(f"Started connection: {LOCAL_HOST}:{local_port}->{server_addr}:{remote_port}(monitor: {monitor_port})")
     return cmd
 
 def _getServerUserAddrAndPorts() -> Tuple[str, str, List[dict]]:
@@ -109,6 +116,7 @@ def stop() -> bool:
             if cmd.replace("\n", "").endswith(v_cmd):
                 valid_pids.append(_pid)
     if len(valid_cmds) != len(valid_pids):
+        print(f"Did not find all pids (find: {valid_pids}/{valid_cmds})")
         KILL_ALL = False
 
     for pid in valid_pids:
@@ -132,14 +140,23 @@ def stop() -> bool:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1:
-        print(f"Usage: {os.path.basename(__file__)} start/stop/restart")
-    elif sys.argv[1] == "start":
+    parser = argparse.ArgumentParser("Control autossh tunnels.")
+    parser.add_argument("cmd", nargs = "?", type = str, default = "show", 
+                        choices = ["start", "stop", "restart", "show"])
+
+    args = parser.parse_args()
+    if args.cmd == "start":
         start()
-    elif sys.argv[1] == "stop":
+    if args.cmd == "stop":
         stop()
-    elif sys.argv[1] == "restart":
+    if args.cmd == "restart":
         stop()
         start()
-    else:
-        print(f"Usage: {os.path.basename(__file__)} start/stop/restart")
+    if args.cmd == "show":
+        if os.path.exists(CMD_LOG_PATH):
+            print("Running CMDs:")
+            with open(CMD_LOG_PATH, "r") as fp:
+                running_cmd = fp.read()
+                print(running_cmd)
+        else:
+            print("Not started.")
