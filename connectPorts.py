@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os, json, sys, datetime, argparse
-from typing import Tuple, List, Union
+from typing import Tuple, List, Union, TypedDict
 import subprocess
 
 HOME_DIR = os.getenv("HOME")
@@ -20,6 +20,12 @@ LOG_PATH = os.path.join(HOME_DIR, LOG_FNAME)
 LOCAL_HOST = "127.0.0.1"
 #  LOCAL_HOST = "localhost"
 
+class PortMapType(TypedDict):
+    local_port: str
+    remote_port: str
+    monitor_port: str
+    Description: str
+
 def _connectPort(user: str, server_addr: str, local_port: str, remote_port: str, monitor_port: str) -> str:
     log_path = os.path.join(HOME_DIR, LOG_FNAME)
     if not os.path.exists(log_path):
@@ -33,7 +39,7 @@ def _connectPort(user: str, server_addr: str, local_port: str, remote_port: str,
     print(f"Started connection: {LOCAL_HOST}:{local_port}->{server_addr}:{remote_port}(monitor: {monitor_port})")
     return cmd
 
-def _getServerUserAddrAndPorts() -> Tuple[str, str, List[dict]]:
+def _getServerUserAddrAndPorts() -> Tuple[str, str, List[PortMapType]]:
     LOCAL_CONF = os.path.join(HOME_DIR, CONF_FNAME)
     GLOBAL_CONF = os.path.join(CONF_INSTALL_DIR, CONF_FNAME)
     if os.path.exists(LOCAL_CONF):
@@ -48,6 +54,13 @@ def _getServerUserAddrAndPorts() -> Tuple[str, str, List[dict]]:
     server_addr = server["addr"]
     server_user = server["user"]
     port_maps = server["port_map"]
+    # set default values
+    for i in range(len(port_maps)):
+        _map = port_maps[i]
+        if not "description" in _map:
+            _map["description"] = ""
+        if not "monitor_port" in _map:
+            _map["monitor_port"] = "0"
     return server_user, server_addr, port_maps
 
 def _getPname(id) -> Union[str, None]:
@@ -160,3 +173,4 @@ if __name__ == "__main__":
                 print(running_cmd)
         else:
             print("Not started.")
+        print("for usage: -h/--help")
