@@ -1,0 +1,16 @@
+[Unit]
+Description=start a basic autossh connection service for ssh.
+Wants=network-online.target
+After=network-online.target
+# StartLimitIntervalSec=500
+# StartLimitBurst=5
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/autossh -M <MONITOR_PORT> -NR <REMOTE_PORT>:localhost:22 root@<YOUR_SERVER>
+Restart=always
+RestartSec=30
+User=root
+
+[Install]
+WantedBy=multi-user.target
