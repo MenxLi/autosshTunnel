@@ -1,10 +1,15 @@
 #!/usr/bin/bash
 
-THIS_DIR=$(dirname $BASH_SOURCE)
+THIS_DIR=$(cd $(dirname $BASH_SOURCE) && pwd)
 ROOT_CONF=/etc/.connectPorts_conf.json
 
-sudo cp $THIS_DIR/connectPorts.py /usr/bin/connectPorts
+# sudo cp $THIS_DIR/connectPorts.py /usr/bin/connectPorts
+
+# run with current python interpreter
+sudo touch /usr/bin/connectPorts
+sudo echo "python3 $THIS_DIR/connectPorts.py \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8 \$9" > /usr/bin/connectPorts
 sudo chmod a+x /usr/bin/connectPorts
+echo "Installed connectPorts to /usr/bin/connectPorts"
 
 if [ ! -f $ROOT_CONF ]
 then

@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
 import os, json, sys, datetime, argparse
 from typing import Tuple, List, Union, TypedDict
 import subprocess
